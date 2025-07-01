@@ -1,0 +1,76 @@
+// alu.v - 4-bit ALU supporting ADD, SUB, AND, OR, NOT operations
+
+module alu(
+    input  [3:0] a,
+    input  [3:0] b,
+    input  [2:0] op,     // Operation select
+    output reg [3:0] result
+);
+
+    // Operation codes
+    // 000 - ADD
+    // 001 - SUB
+    // 010 - AND
+    // 011 - OR
+    // 100 - NOT (on A)
+
+    always @(*) begin
+        case (op)
+            3'b000: result = a + b;         // ADD
+            3'b001: result = a - b;         // SUB
+            3'b010: result = a & b;         // AND
+            3'b011: result = a | b;         // OR
+            3'b100: result = ~a;            // NOT (on a)
+            default: result = 4'b0000;
+        endcase
+    end
+
+endmodule
+// alu_tb.v - Testbench for ALU
+
+`timescale 1ns/1ps
+
+module alu_tb;
+
+    reg  [3:0] a, b;
+    reg  [2:0] op;
+    wire [3:0] result;
+
+    alu uut (
+        .a(a),
+        .b(b),
+        .op(op),
+        .result(result)
+    );
+
+    initial begin
+        $display("ALU Testbench Started");
+        // Test ADD
+        a = 4'b0011; b = 4'b0001; op = 3'b000; #10;
+        $display("ADD: %d + %d = %d", a, b, result);
+
+        // Test SUB
+        a = 4'b0100; b = 4'b0001; op = 3'b001; #10;
+        $display("SUB: %d - %d = %d", a, b, result);
+
+        // Test AND
+        a = 4'b1010; b = 4'b1100; op = 3'b010; #10;
+        $display("AND: %b & %b = %b", a, b, result);
+
+        // Test OR
+        a = 4'b1010; b = 4'b1100; op = 3'b011; #10;
+        $display("OR: %b | %b = %b", a, b, result);
+
+        // Test NOT
+        a = 4'b1010; b = 4'b0000; op = 3'b100; #10;
+        $display("NOT: ~%b = %b", a, result);
+
+        // Test Default
+        a = 4'b1111; b = 4'b1010; op = 3'b111; #10;
+        $display("Default: result = %b", result);
+
+        $display("ALU Testbench Finished");
+        $stop;
+    end
+
+endmodule
